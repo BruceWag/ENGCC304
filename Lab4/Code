@@ -1,0 +1,24 @@
+#include <stdio.h>
+
+int main() {
+    char Employees_ID[10] ;
+    int Hour ;
+    float salary , ratePerHour ; 
+
+    printf("The Empolyees_ID : " ) ; 
+    scanf("%s", Employees_ID) ;
+
+    printf("The Working hrs : ") ; 
+    scanf("%d", &Hour) ; 
+
+    printf("Salary amount/hr : ") ;
+    scanf("%f", &ratePerHour) ; 
+
+    salary = Hour * ratePerHour ; 
+
+    printf("Empolyees_ID = %s\n", Employees_ID) ;
+    printf("Salary = %.2f\n", salary) ; 
+
+    return 0 ;
+
+}
