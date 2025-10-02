@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+int main() {
+    int position, years, projects;
+    int baseSalary[3] = {20000, 35000, 50000};
+    int salary;
+    float expBonus = 0, specialBonus = 0, netSalary = 0;
+
+    printf("Enter Position (1=Junior, 2=Mid-Level, 3=Senior): ");
+    scanf("%d", &position);
+    printf("Enter Years of Experience: ");
+    scanf("%d", &years);
+    printf("Enter Number of Projects Completed this Year: ");
+    scanf("%d", &projects);
+
+    salary = baseSalary[position - 1];
+
+    if (years < 1) {
+        expBonus = 0;
+    } else if (years >= 1 && years <= 3) {
+        expBonus = salary * 0.10;
+    } else if (years >= 4 && years <= 5) {
+        expBonus = salary * 0.15;
+    } else if (years > 5) {
+        expBonus = salary * 0.20;
+    }
+
+    if (projects > 5) {
+        specialBonus = salary * 0.05;
+    }
+
+    netSalary = salary + expBonus + specialBonus;
+
+    printf("\nBase Salary: %d THB", salary);
+    printf("\nExperience Bonus: %.0f THB", expBonus);
+    printf("\nSpecial Bonus: %.0f THB", specialBonus);
+    printf("\nNet Salary: %.0f THB\n", netSalary);
+
+    return 0;
+}
