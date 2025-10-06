@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <math.h>
+
+//ฟังชั่นตรวจสอบว่าเป้น สตรองหรือไม่
+int isArmstrong(int num) {
+    int original = num;
+    int sum = 0, digit;
+    int n = 0, temp;
+    
+    //หาจำนวนหลักของตัวเลข
+    temp = num;
+    while (temp > 0) {
+        n++;
+        temp /= 10;
+    }
+
+    //คำนวนผลรวมของแต่ละหลักยฟกำลัง n
+    temp = num;
+    while(temp > 0) {
+        digit = temp % 10;
+        sum += pow(digit, n);
+        temp /= 10;
+    }
+
+    //คืนค่า 1 ถ้าเป้น สตรอง, 0 ถ้าไม่ใช่
+    return (sum == original);
+}
+
+int main() {
+    int num;
+
+    //รับค่า
+    printf("Enter number : \n");
+    scanf("%d", &num);
+
+    //แสดง
+     if(isArmstrong(num)) {
+        printf("Pass \n");
+     } else {
+        printf("Not Pass \n");
+     }
+
+     return 0;
+}
