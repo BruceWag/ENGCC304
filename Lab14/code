@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h> // สำหรับ EXIT_SUCCESS/FAILURE
+
+// กำหนดขนาดสูงสุดของอาเรย์
+#define MAX_SIZE 100
+
+/**
+ * @brief ฟังก์ชันสำหรับหาค่าต่ำสุดและสูงสุดในอาเรย์
+ * ผลลัพธ์ (min และ max) จะถูกส่งกลับผ่าน Pointer
+ *
+ * @param arr อาเรย์ของตัวเลขจำนวนเต็ม
+ * @param n จำนวนสมาชิกจริงในอาเรย์
+ * @param min_ptr Pointer ชี้ไปที่ตัวแปรสำหรับเก็บค่าต่ำสุด
+ * @param max_ptr Pointer ชี้ไปที่ตัวแปรสำหรับเก็บค่าสูงสุด
+ */
+void findMinMax(int arr[], int n, int *min_ptr, int *max_ptr) {
+    // ตาม Flowchart: Condition 1 (n <= 0) - ไม่จำเป็นต้องทำอะไรถ้า n <= 0
+    if (n <= 0) {
+        return;
+    }
+
+    // Process: กำหนดค่าเริ่มต้นเป็นสมาชิกตัวแรกของอาเรย์
+    *min_ptr = arr[0];
+    *max_ptr = arr[0];
+
+    // Loop ค้นหาค่าต่ำสุดและสูงสุด
+    // Process: i = 1 (เริ่มต้นจากสมาชิกตัวที่สอง)
+    for (int i = 1; i < n; i++) {
+        // Condition 3: arr[i] < *min_ptr (ค่าปัจจุบันน้อยกว่าค่าต่ำสุดที่พบ)
+        if (arr[i] < *min_ptr) {
+            // Process: *min_ptr = arr[i]
+            *min_ptr = arr[i];
+        }
+
+        // Condition 4: arr[i] > *max_ptr (ค่าปัจจุบันมากกว่าค่าสูงสุดที่พบ)
+        if (arr[i] > *max_ptr) {
+            // Process: *max_ptr = arr[i]
+            *max_ptr = arr[i];
+        }
+    }
+    // Stop (findMinMax) - สิ้นสุดฟังก์ชัน
+}
+
+int main() {
+    // Process: ประกาศตัวแปร
+    int arr[MAX_SIZE];
+    int N;
+    int min_val, max_val;
+    int i; // ตัวนับสำหรับลูป
+
+    // Input/Output: รับจำนวนสมาชิก N
+    printf("Enter the number of elements (1-%d): ", MAX_SIZE);
+    // ตรวจสอบว่ารับค่า N ได้สำเร็จหรือไม่ และตรวจสอบเงื่อนไข N
+    if (scanf("%d", &N) != 1) {
+        // Process: แสดงข้อผิดพลาดและ return 1 (N ไม่ใช่ตัวเลข)
+        printf("Input error: The number of elements must be an integer.\n");
+        return EXIT_FAILURE;
+    }
+
+    // Condition: N <= 0 หรือ N > MAX_SIZE
+    if (N <= 0 || N > MAX_SIZE) {
+        // Process: แสดงข้อผิดพลาดและ return 1
+        printf("Error: The number of elements must be between 1 and %d.\n", MAX_SIZE);
+        return EXIT_FAILURE;
+    }
+
+    // Input/Output: รับค่าสมาชิก N ตัว
+    printf("Enter %d values, separated by space or new line:\n", N);
+    
+    // Loop 1: Input Array (i = 0, i < N, i++)
+    for (i = 0; i < N; i++) {
+        // Input/Output: รับค่า arr[i]
+        if (scanf("%d", &arr[i]) != 1) {
+            printf("Input error: All values must be integers.\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    // Function: เรียกใช้ findMinMax (ส่งที่อยู่ของ min_val และ max_val ไป)
+    findMinMax(arr, N, &min_val, &max_val);
+
+    // Output: แสดง Index
+    printf("\nIndex: ");
+    // Loop 2: Output Index (i = 0, i < N, i++)
+    for (i = 0; i < N; i++) {
+        // Input/Output: แสดงค่า i
+        printf("%d ", i);
+    }
+    // Input/Output: ขึ้นบรรทัดใหม่
+    printf("\n");
+
+    // Output: แสดง Array
+    printf("Array: ");
+    // Loop 3: Output Array (i = 0, i < N, i++)
+    for (i = 0; i < N; i++) {
+        // Input/Output: แสดงค่า arr[i]
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    // Input/Output: แสดงค่าต่ำสุดและสูงสุดที่หาได้
+    printf("Min: %d\n", min_val);
+    printf("Max: %d\n", max_val);
+
+    // Process: return 0
+    return EXIT_SUCCESS;
+    // Stop (main)
+}
