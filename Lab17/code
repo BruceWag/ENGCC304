@@ -1,1 +1,243 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
+// กำหนดขนาดสูงสุดของห้องสมุด
+#define MAX_BOOKS 100
+// กำหนดขนาดสูงสุดของสตริงสำหรับชื่อและผู้แต่ง
+#define MAX_STRING_LEN 100
+
+// โครงสร้าง (Structure) สำหรับเก็บข้อมูลหนังสือแต่ละเล่ม
+typedef struct {
+    int bookId;     // รหัสหนังสือ
+    char title[MAX_STRING_LEN]; // ชื่อหนังสือ
+    char author[MAX_STRING_LEN]; // ผู้แต่ง
+    int year;       // ปีที่พิมพ์
+} Book;
+
+// --- Prototypes ของฟังก์ชันหลัก ---
+void displayMenu();
+void addBook(Book books[], int *count);
+void searchBook(Book books[], int count);
+void displayBooks(Book books[], int count);
+void normalizeString(char *str);
+
+/**
+ * @brief แสดงเมนูการทำงานหลักของโปรแกรม
+ */
+void displayMenu() {
+    printf("\n--- Library Management System ---\n");
+    printf("1. Add New Book\n");
+    printf("2. Search Book by Title\n");
+    printf("3. Display All Books\n");
+    printf("4. Exit Program\n");
+    printf("----------------------------------\n");
+    printf("Please choose an option: ");
+}
+
+/**
+ * @brief ฟังก์ชันสำหรับทำความสะอาดสตริง โดยการแปลงเป็นตัวพิมพ์เล็กทั้งหมด
+ * เพื่อใช้ในการค้นหาแบบไม่คำนึงถึงขนาดตัวอักษร (Case-insensitive comparison)
+ * @param str สตริงที่ต้องการทำความสะอาด
+ */
+void normalizeString(char *str) {
+    if (str == NULL) return;
+    for (int i = 0; str[i]; i++) {
+        str[i] = tolower(str[i]);
+    }
+}
+
+/**
+ * @brief ฟังก์ชันสำหรับเพิ่มข้อมูลหนังสือใหม่เข้าสู่ Library Array
+ * @param books อาร์เรย์ของโครงสร้าง Book
+ * @param count ตัวชี้ไปยังจำนวนหนังสือปัจจุบัน
+ */
+void addBook(Book books[], int *count) {
+    // ตรวจสอบว่าห้องสมุดเต็มหรือไม่
+    if (*count >= MAX_BOOKS) {
+        printf("\n[Alert] Library is full. Cannot add more books.\n");
+        return;
+    }
+
+    printf("\n--- Add New Book ---\n");
+
+    // รับ Book ID (รหัสหนังสือ)
+    printf("Enter Book ID: ");
+    if (scanf("%d", &books[*count].bookId) != 1) {
+        printf("[Error] Invalid input for Book ID.\n");
+        // ล้าง buffer
+        while (getchar() != '\n');
+        return;
+    }
+    // ล้าง buffer หลังจากการรับ int
+    while (getchar() != '\n');
+
+    // รับ Title (ชื่อหนังสือ)
+    printf("Enter Title: ");
+    // ใช้ fgets เพื่อรับชื่อที่มีช่องว่าง
+    if (fgets(books[*count].title, MAX_STRING_LEN, stdin) == NULL) return;
+    // ลบอักขระขึ้นบรรทัดใหม่ '\n' ที่มากับ fgets
+    books[*count].title[strcspn(books[*count].title, "\n")] = 0;
+
+    // รับ Author (ผู้แต่ง)
+    printf("Enter Author: ");
+    if (fgets(books[*count].author, MAX_STRING_LEN, stdin) == NULL) return;
+    books[*count].author[strcspn(books[*count].author, "\n")] = 0;
+
+    // รับ Year (ปีที่พิมพ์)
+    printf("Enter Year: ");
+    if (scanf("%d", &books[*count].year) != 1) {
+        printf("[Error] Invalid input for Year.\n");
+        // ล้าง buffer
+        while (getchar() != '\n');
+        return;
+    }
+    // ล้าง buffer หลังจากการรับ int
+    while (getchar() != '\n');
+
+
+    (*count)++;
+    printf("\n[Success] Book \"%s\" added to the system.\n", books[*count - 1].title);
+}
+
+/**
+ * @brief ฟังก์ชันสำหรับค้นหาหนังสือตามชื่อ (ค้นหาส่วนของชื่อได้และไม่คำนึงถึงตัวพิมพ์เล็ก/ใหญ่)
+ * @param books อาร์เรย์ของโครงสร้าง Book
+ * @param count จำนวนหนังสือทั้งหมด
+ */
+void searchBook(Book books[], int count) {
+    // ตรวจสอบว่ามีหนังสือในระบบหรือไม่
+    if (count == 0) {
+        printf("\n[Alert] The library is empty. No books to search.\n");
+        return;
+    }
+
+    char searchTitle[MAX_STRING_LEN];
+    char normalizedSearchTitle[MAX_STRING_LEN];
+    int found = 0;
+
+    printf("\n--- Search Book by Title ---\n");
+    printf("Enter the title or keyword to search: ");
+
+    // *** ส่วนที่แก้ไข: ล้าง buffer ก่อนรับ input อย่างชัดเจน ***
+    // (ถึงแม้ว่าใน main() จะมีแล้ว แต่การทำซ้ำในฟังก์ชันรับ string ปลอดภัยกว่า)
+    // while (getchar() != '\n'); // ถูกย้ายมาทำใน main/caller แต่ใส่ไว้ก็ได้เพื่อความมั่นใจ
+    
+    if (fgets(searchTitle, MAX_STRING_LEN, stdin) == NULL) return;
+    searchTitle[strcspn(searchTitle, "\n")] = 0; // ลบ '\n'
+
+    // ตรวจสอบว่าสตริงที่ค้นหามีความยาวเป็นศูนย์หรือไม่ (ผู้ใช้กด Enter ทันที)
+    if (strlen(searchTitle) == 0) {
+        printf("[Alert] Search keyword cannot be empty.\n");
+        return;
+    }
+
+    // คัดลอกและทำความสะอาดสตริงสำหรับเปรียบเทียบ
+    strcpy(normalizedSearchTitle, searchTitle);
+    normalizeString(normalizedSearchTitle);
+
+    printf("\n--- Search Results ---\n");
+    // วนลูปเพื่อค้นหาหนังสือทุกเล่ม
+    for (int i = 0; i < count; i++) {
+        char currentBookTitle[MAX_STRING_LEN];
+        strcpy(currentBookTitle, books[i].title);
+        normalizeString(currentBookTitle);
+
+        // ใช้ strstr เพื่อค้นหาสตริงย่อย (substring matching) หลังจากการ normalize
+        if (strstr(currentBookTitle, normalizedSearchTitle) != NULL) {
+            // แสดงข้อมูลหนังสือที่พบ
+            printf("--------------------------------\n");
+            printf("Book ID: %d\n", books[i].bookId);
+            printf("Title: %s\n", books[i].title);
+            printf("Author: %s\n", books[i].author);
+            printf("Year: %d\n", books[i].year);
+            printf("--------------------------------\n");
+            found = 1;
+        }
+    }
+
+    // หากไม่พบหนังสือใด ๆ
+    if (!found) {
+        printf("Book not found.\n");
+    }
+}
+
+/**
+ * @brief ฟังก์ชันสำหรับแสดงรายชื่อหนังสือทั้งหมดในห้องสมุด
+ * @param books อาร์เรย์ของโครงสร้าง Book
+ * @param count จำนวนหนังสือทั้งหมด
+ */
+void displayBooks(Book books[], int count) {
+    // ตรวจสอบว่ามีหนังสือในระบบหรือไม่
+    if (count == 0) {
+        printf("\n[Alert] The library is empty. No books in the system.\n");
+        return;
+    }
+
+    printf("\n--- All Books in the Library (%d Books) ---\n", count);
+    // ใช้ format specifiers สำหรับจัดคอลัมน์ให้สวยงาม
+    printf("ID     | Title%*s | Author%*s | Year\n", MAX_STRING_LEN - 6, "", MAX_STRING_LEN - 7, "");
+    printf("-------|------------------------------------|----------------------------------|-----------\n");
+
+    // วนลูปแสดงข้อมูลของหนังสือแต่ละเล่ม
+    for (int i = 0; i < count; i++) {
+        printf("%-6d | %-*s | %-*s | %d\n",
+               books[i].bookId,
+               MAX_STRING_LEN - 1, books[i].title,
+               MAX_STRING_LEN - 1, books[i].author,
+               books[i].year);
+    }
+    printf("------------------------------------------------------------------------------------------------------------------------------------------------\n");
+}
+
+/**
+ * @brief ฟังก์ชันหลักของโปรแกรม (Main function)
+ */
+int main() {
+    Book library[MAX_BOOKS]; // อาร์เรย์สำหรับเก็บข้อมูลหนังสือ
+    int bookCount = 0;       // ตัวนับจำนวนหนังสือปัจจุบัน
+    int choice;
+
+    // เพิ่มข้อมูลเริ่มต้น 3 เล่มเพื่อสาธิต/ทดสอบระบบ
+    library[0] = (Book){101, "The C Programming Language", "Dennis Ritchie", 1978};
+    library[1] = (Book){102, "Clean Code", "Robert C. Martin", 2008};
+    library[2] = (Book){103, "The Lord of the Rings", "J.R.R. Tolkien", 1954};
+    bookCount = 3;
+
+    // ลูปหลักของโปรแกรม (แสดงเมนูและรับตัวเลือก)
+    while (1) {
+        displayMenu();
+        // รับตัวเลือกจากผู้ใช้
+        if (scanf("%d", &choice) != 1) {
+            // กรณีผู้ใช้ป้อนข้อมูลที่ไม่ใช่ตัวเลข
+            printf("\n[Error] Invalid input. Please enter a valid menu number.\n");
+            // ล้าง buffer
+            while (getchar() != '\n');
+            continue;
+        }
+        // ล้าง buffer
+        while (getchar() != '\n'); // *** การล้าง buffer ตรงนี้สำคัญมาก ก่อนวนกลับไปแสดงเมนู หรือเรียกฟังก์ชันที่ต้องการ string input ***
+
+        // ประมวลผลตามตัวเลือกที่ผู้ใช้เลือก
+        switch (choice) {
+            case 1:
+                addBook(library, &bookCount);
+                break;
+            case 2:
+                // ในฟังก์ชัน searchBook เราไม่ได้ทำการล้าง buffer ซ้ำ เพราะเราคาดหวังว่า main loop จะจัดการ '\n' ที่เหลือจาก scanf ไปแล้ว
+                searchBook(library, bookCount);
+                break;
+            case 3:
+                displayBooks(library, bookCount);
+                break;
+            case 4:
+                printf("\n--- Thank you for using the Library Management System. Goodbye! ---\n");
+                return 0; // ออกจากโปรแกรม
+            default:
+                printf("\n[Error] Invalid menu choice. Please select a number between 1-4.\n");
+        }
+    }
+
+    return 0;
+}
